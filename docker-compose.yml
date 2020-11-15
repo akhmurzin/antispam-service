@@ -1,0 +1,30 @@
+version: "3"
+services:
+  # Для запуска приложения запустите: docker-compose up -d web
+  web:
+    image: library/nginx:alpine
+    ports:
+      - "8080:8080"
+    depends_on:
+      - fpm
+
+  # Процесс fpm
+  fpm:
+    build: ./docker/php
+    volumes:
+      - ./:/code
+
+
+  # Для запуска тестов запустите: docker-composer run tests
+  tests:
+    build: ./docker/php
+    command: /usr/local/bin/codecept run -vvv
+    volumes:
+      - ./:/code
+
+  # Для запуска терминала с настроенной средой php запустите: docker-composer run terminal
+  terminal:
+    build: ./docker/php
+    entrypoint: /bin/sh
+    volumes:
+      - ./:/code
