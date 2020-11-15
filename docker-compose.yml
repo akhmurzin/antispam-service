@@ -21,12 +21,14 @@ services:
       - ./:/code
 
 
-  # Для запуска тестов запустите: docker-composer run tests
+  # Для запуска тестов запустите: docker-composer up tests
   tests:
     build: ./docker/php
     command: /usr/local/bin/codecept run -vvv
     volumes:
       - ./:/code
+    depends_on:
+      - web
 
   # Для запуска терминала с настроенной средой php запустите: docker-composer run terminal
   terminal:
