@@ -1,6 +1,6 @@
 # Сервис "антиспам" на PHP
 
-Создать сервис целью которого будет определять является ли сообщение спамом.
+Создать сервис который принимает на вход сообщение и проверяет является ли оно спамом.
 
 ## Нормализация сообщения
 
@@ -60,10 +60,10 @@ text=текст сообщения&check_rate=0
 HTTP/1.1 200 OK
 
 {
-	"status": "ok",
-	"spam": false,
+    "status": "ok",
+    "spam": false,
     "reason": ""
-	"normalized_text": "нормализованные токены через пробел",
+    "normalized_text": "нормализованные токены через пробел",
 }
 ```
 
@@ -73,10 +73,10 @@ HTTP/1.1 200 OK
 HTTP/1.1 200 OK
 
 {
-	"status": "ok",
-	"spam": true,
-	"reason": "причина почему сообщение считается спамом (block_list, duplicate итп.)",
-	"normalized_text": "нормализованные токены через пробел"
+    "status": "ok",
+    "spam": true,
+    "reason": "причина почему сообщение считается спамом (block_list, duplicate итп.)",
+    "normalized_text": "нормализованные токены через пробел"
 }
 ```
 
@@ -86,8 +86,8 @@ HTTP/1.1 200 OK
 HTTP/1.1 400 OK
 
 {
-	"status": "error",
-	"message": "field text required"
+    "status": "error",
+    "message": "field text required"
 }
 ```
 
