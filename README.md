@@ -97,6 +97,6 @@ HTTP/1.1 400 OK
 
 ## Приложение
 
-[Стопслова](./docs/stopwords.txt)
+[Стоп слова](./docs/stopwords.txt)
 
 [Запрещенные слова](./docs/blocklist.txt)
