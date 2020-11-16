@@ -12,6 +12,7 @@ services:
       - "8080:8080"
     depends_on:
       - fpm
+      - redis
     stop_signal: SIGTERM
 
   # Процесс fpm
@@ -20,6 +21,9 @@ services:
     volumes:
       - ./:/code
 
+  # Редис
+  redis:
+    image: "redis:5-alpine"
 
   # Для запуска тестов запустите: docker-compose up tests
   tests:
