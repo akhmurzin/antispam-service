@@ -1,6 +1,9 @@
 <?php
 header('Content-type: application/json; charset=utf-8');
-/*Функция преобразующая данные файла в массив*/
+/**
+ * Функция преобразующая данные файла в массив
+ * @param $path
+ */
 function process_file($path)
 {
     $wordArray = explode("\n", file_get_contents($path));
@@ -11,9 +14,12 @@ function process_file($path)
 
     return $wordArray;
 }
-/**Преорбразуем входящее сообщение в массив нормализовнных токенов*/
-function normalize($post)
 
+/**
+ * Преорбразуем входящее сообщение в массив нормализовнных токенов
+ * @param $post
+ */
+function normalize($post)
 {
     if (!empty($post["text"])) {
         $txt = $post["text"];
@@ -59,9 +65,12 @@ function normalize($post)
 
     return $tokensArray;
 }
-/**Проверка на наличие слов из запрещенного списка*/
-function block_list($checkArray)
 
+/**
+ * Проверка на наличие слов из запрещенного списка
+ * @param $checkArray
+ */
+function block_list($checkArray)
 {
     $blockWords = process_file('/code/docs/blocklist.txt');
     var_dump($blockWords);
