@@ -39,7 +39,7 @@ class ApiCest
      */
     public function positive(ApiTester $I, Example $example)
     {
-        $I->sendPost('/is_spam', ['text' => $example['text'], 'check_rate' => 0,]);
+        $I->sendPost('/is_spam', ['text' => $example['text'], 'check_rate' => 0]);
         $I->seeResponseCodeIs(200);
         $I->seeResponseIsJson();
 
