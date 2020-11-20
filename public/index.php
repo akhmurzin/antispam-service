@@ -1,8 +1,9 @@
 <?php
 header('Content-type: application/json; charset=utf-8');
-//echo json_encode(['status' => 'ok', 'message' => 'Kolesa Academy!']);
 
-function process_file($path) {
+
+function process_file($path)
+{
     $wordArray = explode("\n", file_get_contents($path));
     foreach ($wordArray as &$eachWord) {
         $eachWord = trim($eachWord);
@@ -11,8 +12,9 @@ function process_file($path) {
 
     return $wordArray;
 }
-
-function normalize($post) {
+/*Преорбразуем входящее сообщение в массив нормализовнных токенов*/
+function normalize($post)
+{
     if (!empty($post["text"])) {
         $txt = $post["text"];
     }
@@ -57,15 +59,17 @@ function normalize($post) {
 
     return $tokensArray;
 }
-
-function block_list($checkArray) {
+/*Проверка на наличие слов из запрещенного списка*/
+function block_list($checkArray)
+{
     $blockWords = process_file('/code/docs/blocklist.txt');
     var_dump($blockWords);
-    $blockFound = (bool)count(array_intersect($blockWords, $checkArray));
+    $blockFound = (bool) count(array_intersect($blockWords, $checkArray));
     var_dump($blockFound);
     if ($blockFound) {
 //        return "Block word is found";
-        return ['status' => 'ok', 'spam' => 'true', 'reason' => 'block_list', 'normalized_text' => "placeholder for array"];
+        return ['status'      => 'ok', 'spam' => 'true', 'reason' => 'block_list',
+            'normalized_text' => "placeholder for array", ];
     }
 }
 
