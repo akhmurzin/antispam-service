@@ -1,8 +1,9 @@
 <?php
 header('Content-type: application/json; charset=utf-8');
+
 /**
  * Функция преобразующая данные файла в массив
- * @param $path
+ * @param string $path Путь до файла
  */
 function process_file($path)
 {
@@ -17,7 +18,7 @@ function process_file($path)
 
 /**
  * Преорбразуем входящее сообщение в массив нормализовнных токенов
- * @param $post
+ * @param array $post Глобальный массив _POST
  */
 function normalize($post)
 {
@@ -68,7 +69,7 @@ function normalize($post)
 
 /**
  * Проверка на наличие слов из запрещенного списка
- * @param $checkArray
+ * @param array $checkArray Массив для проверки
  */
 function block_list($checkArray)
 {
