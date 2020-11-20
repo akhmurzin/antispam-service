@@ -8,6 +8,7 @@ function process_file($path) {
         $eachWord = trim($eachWord);
     }
     unset($eachWord);
+
     return $wordArray;
 }
 
@@ -15,8 +16,8 @@ function normalize($post) {
     if (!empty($post["text"])) {
         $txt = $post["text"];
     }
-    $tokensArray = array();
-    $tok = strtok($txt, " .,!?[]()<>:;-\n'\r\"/*|");
+    $tokensArray = [];
+    $tok         = strtok($txt, " .,!?[]()<>:;-\n'\r\"/*|");
     while ($tok !== false) {
         array_push($tokensArray, $tok);
         $tok = strtok(" .,!?[]()<>:;-\n'\r\"/*|");
@@ -70,7 +71,7 @@ function block_list($checkArray) {
 
 if (!empty($_POST)) {
     $normalizedArray = normalize($_POST);
-    $isSpam = block_list($normalizedArray);
+    $isSpam          = block_list($normalizedArray);
     echo json_encode($isSpam);
 } else {
     echo "\nArray is empty";

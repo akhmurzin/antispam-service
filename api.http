@@ -9,3 +9,8 @@ Content-Type: application/x-www-form-urlencoded
 text=This dONne.кАк KefwW,PO!aS?Теперь[rfffr]еслИ уКк(Тут)234 ef 6353 аккп маСсАж Митинг фву ееп
 
 ###
+
+GET http://localhost:8080/
+Accept: application/json
+
+###
