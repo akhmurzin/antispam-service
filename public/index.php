@@ -74,5 +74,5 @@ if (!empty($_POST)) {
     $isSpam          = block_list($normalizedArray);
     echo json_encode($isSpam);
 } else {
-    echo "\nArray is empty";
+    echo json_encode(['status' => 'error', 'message' => 'no text']);
 }

@@ -14,3 +14,9 @@ GET http://localhost:8080/
 Accept: application/json
 
 ###
+
+POST http://localhost:8080/index.php
+Content-Type: application/x-www-form-urlencoded
+
+
+###
