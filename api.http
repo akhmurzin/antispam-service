@@ -1,0 +1,11 @@
+http://localhost:8080/index.php
+Accept: application/json
+
+###
+
+POST http://localhost:8080/index.php
+Content-Type: application/x-www-form-urlencoded
+
+text=This dONne.кАк KefwW,PO!aS?Теперь[rfffr]еслИ уКк(Тут)234 ef 6353 аккп маСсАж Митинг фву ееп
+
+###
