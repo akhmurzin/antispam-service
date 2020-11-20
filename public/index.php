@@ -62,7 +62,7 @@ function normalize($post)
 
     sort($tokensArray);
     echo "Отсортированный массив:\n";
-    print_r($tokensArray);
+//    print_r($tokensArray);
 
     return $tokensArray;
 }
@@ -74,9 +74,9 @@ function normalize($post)
 function block_list($checkArray)
 {
     $blockWords = process_file('/code/docs/blocklist.txt');
-    print_r($blockWords);
+//    print_r($blockWords);
     $blockFound = (bool) count(array_intersect($blockWords, $checkArray));
-    print_r($blockFound);
+//    print_r($blockFound);
     if ($blockFound) {
 //        return "Block word is found";
         return [
