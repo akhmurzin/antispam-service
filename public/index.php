@@ -1,7 +1,6 @@
 <?php
 header('Content-type: application/json; charset=utf-8');
-
-
+/*Функция преобразующая данные файла в массив*/
 function process_file($path)
 {
     $wordArray = explode("\n", file_get_contents($path));
@@ -12,8 +11,9 @@ function process_file($path)
 
     return $wordArray;
 }
-/*Преорбразуем входящее сообщение в массив нормализовнных токенов*/
+/**Преорбразуем входящее сообщение в массив нормализовнных токенов*/
 function normalize($post)
+
 {
     if (!empty($post["text"])) {
         $txt = $post["text"];
@@ -59,8 +59,9 @@ function normalize($post)
 
     return $tokensArray;
 }
-/*Проверка на наличие слов из запрещенного списка*/
+/**Проверка на наличие слов из запрещенного списка*/
 function block_list($checkArray)
+
 {
     $blockWords = process_file('/code/docs/blocklist.txt');
     var_dump($blockWords);
@@ -68,8 +69,12 @@ function block_list($checkArray)
     var_dump($blockFound);
     if ($blockFound) {
 //        return "Block word is found";
-        return ['status'      => 'ok', 'spam' => 'true', 'reason' => 'block_list',
-            'normalized_text' => "placeholder for array", ];
+        return [
+            'status'          => 'ok',
+            'spam'            => 'true',
+            'reason'          => 'block_list',
+            'normalized_text' => "placeholder for array",
+        ];
     }
 }
 
