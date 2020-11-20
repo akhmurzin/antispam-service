@@ -1,7 +1,7 @@
 <?php
-
-use Codeception\Example;
 // phpcs:ignoreFile
+use Codeception\Example;
+
 class ApiCest
 {
     /**
