@@ -6,7 +6,6 @@ use RateLimit\Rate;
 
 header('Content-type: application/json; charset=utf-8', false);
 
-
 /**
  * Функция преобразующая данные файла в массив
  *
@@ -55,7 +54,14 @@ function normalize($text)
     return $tokensArray;
 }
 
-function handle_email($email, $string) {
+/**
+ * Функция для правильной нормализации текста содержащего электронную почту
+ *
+ * @param string $email
+ * @param string $string
+ */
+function handle_email($email, $string)
+{
     $textWithoutEmail = str_replace($email, '', $string);
     $workArray        = normalize($textWithoutEmail);//Нормализованный массив без почты
     array_push($workArray, $email);
