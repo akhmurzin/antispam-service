@@ -134,15 +134,14 @@ function spam_check($checkText, $checkRate)
     }
 
     if (count($normalizedArray) >= 3) {
-
-        if ($redis->exists('lastRequest')){
+        if ($redis->exists('lastRequest')) {
             //normalized array of prev request
             $prevText = json_decode($redis->get('lastRequest'));
             $prevSize = count($prevText);
             $redis->set('lastRequest', json_encode($normalizedArray));
             $count = 0;
 
-            foreach($normalizedArray as $token) {
+            foreach ($normalizedArray as $token) {
                 $found = array_search($token, $prevText);
 
                 if ($found !== false) {
@@ -155,7 +154,6 @@ function spam_check($checkText, $checkRate)
             if ($ratio >= 0.6) {
                 return ['status' => 'ok', 'spam' => true, 'reason' => 'duplicate'];
             }
-
         } else {
             $redis->set('lastRequest', json_encode($normalizedArray));
         }
@@ -178,13 +176,12 @@ function spam_check($checkText, $checkRate)
     return ['status' => 'ok', 'spam' => false, 'reason' => '', 'normalized_text' => implode(" ", $normalizedArray)];
 }
 
-switch($_SERVER['REQUEST_METHOD']) {
+switch ($_SERVER['REQUEST_METHOD']) {
     case 'GET':
         echo json_encode(['status' => 'ok', 'message' => 'Kolesa Academy!']);
         break;
     case 'POST':
-
-        if(!empty($_POST)) {
+        if (!empty($_POST)) {
             $txt       = $_POST["text"];
             $checkRate = $_POST["check_rate"];
             $isSpam    = spam_check($txt, $checkRate);
