@@ -98,8 +98,8 @@ function spam_check($checkText, $checkRate)
 
             return [
                 'status'          => 'ok',
-                'spam' => true,
-                'reason' => 'block_list',
+                'spam'            => true,
+                'reason'          => 'block_list',
                 'normalized_text' => implode(" ", $normalizedEmailArray),
             ];
         }
@@ -126,8 +126,8 @@ function spam_check($checkText, $checkRate)
         if (preg_match('/[\p{Cyrillic}]/u', $word) && preg_match('/[\p{Latin}]/u', $word)) {
             return [
                 'status'          => 'ok',
-                'spam' => true,
-                'reason' => 'mixed_words',
+                'spam'            => true,
+                'reason'          => 'mixed_words',
                 'normalized_text' => implode(" ", $normalizedArray),
             ];
         }
