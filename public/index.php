@@ -9,6 +9,7 @@ header('Content-type: application/json; charset=utf-8', false);
 
 /**
  * Функция преобразующая данные файла в массив
+ *
  * @param string $path Путь до файла
  */
 function process_file($path)
@@ -25,6 +26,7 @@ function process_file($path)
 
 /**
  * Преорбразуем входящее сообщение в массив нормализовнных токенов
+ *
  * @param string $text Сообщение в параметре 'text'
  */
 function normalize($text)
@@ -64,6 +66,7 @@ function handle_email($email, $string) {
 
 /**
  * Проверка на наличие слов из запрещенного списка
+ *
  * @param string $checkText Текст для проверки
  * @param mixed  $checkRate
  */
@@ -83,6 +86,7 @@ function spam_check($checkText, $checkRate)
     //email check
     if (preg_match('/\b[^\s]+@[^\s]+/', $checkText, $match)) {
         $email = filter_var($match[0], FILTER_VALIDATE_EMAIL);
+
         if ($email) {
             $normalizedEmailArray = handle_email($email, $checkText);
 
@@ -105,6 +109,7 @@ function spam_check($checkText, $checkRate)
             'normalized_text' => implode(" ", $normalizedArray),
         ];
     }
+
     //mixed words check
     foreach($normalizedArray as $word) {
         if (preg_match('/[\p{Cyrillic}]/u', $word) && preg_match('/[\p{Latin}]/u', $word)) {
@@ -113,22 +118,28 @@ function spam_check($checkText, $checkRate)
     }
 
     if (count($normalizedArray) >= 3) {
+
         if ($redis->exists('lastRequest')){
             //normalized array of prev request
             $prevText = json_decode($redis->get('lastRequest'));
             $prevSize = count($prevText);
             $redis->set('lastRequest', json_encode($normalizedArray));
             $count = 0;
+
             foreach($normalizedArray as $token) {
                 $found = array_search($token, $prevText);
+
                 if ($found !== false) {
                     $count = $count + 1;
                 }
             }
+
             $ratio = $count / $prevSize;
+
             if ($ratio >= 0.6) {
                 return ['status' => 'ok', 'spam' => true, 'reason' => 'duplicate'];
             }
+
         } else {
             $redis->set('lastRequest', json_encode($normalizedArray));
         }
@@ -156,6 +167,7 @@ switch($_SERVER['REQUEST_METHOD']) {
         echo json_encode(['status' => 'ok', 'message' => 'Kolesa Academy!']);
         break;
     case 'POST':
+
         if(!empty($_POST)) {
             $txt       = $_POST["text"];
             $checkRate = $_POST["check_rate"];
@@ -166,5 +178,6 @@ switch($_SERVER['REQUEST_METHOD']) {
             header($_SERVER["SERVER_PROTOCOL"] . " 400 OK");
             echo json_encode(['status' => 'error', 'message' => 'field text required']);
         }
+
         break;
 }
