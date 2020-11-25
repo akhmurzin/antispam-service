@@ -1,5 +1,11 @@
 <?php
-header('Content-type: application/json; charset=utf-8');
+require __DIR__ . '/../vendor/autoload.php';
+use RateLimit\Exception\LimitExceeded;
+use RateLimit\PredisRateLimiter;
+use RateLimit\Rate;
+
+header('Content-type: application/json; charset=utf-8', false);
+
 
 /**
  * Функция преобразующая данные файла в массив
@@ -7,91 +13,158 @@ header('Content-type: application/json; charset=utf-8');
  */
 function process_file($path)
 {
-    $wordArray = explode("\n", file_get_contents($path));
-    foreach ($wordArray as &$eachWord) {
-        $eachWord = trim($eachWord);
-    }
-    unset($eachWord);
+    $words = explode("\n", file_get_contents($path));
 
-    return $wordArray;
+    foreach ($words as &$word) {
+        $word = trim($word);
+    }
+    unset($word);
+
+    return $words;
 }
 
 /**
  * Преорбразуем входящее сообщение в массив нормализовнных токенов
- * @param array $post Глобальный массив _POST
+ * @param string $text Сообщение в параметре 'text'
  */
-function normalize($post)
+function normalize($text)
 {
-    if (!empty($post["text"])) {
-        $txt = $post["text"];
-    }
-    $tokensArray = [];
-    $tok         = strtok($txt, " .,!?[]()<>:;-\n'\r\"/*|");
-    while ($tok !== false) {
-        array_push($tokensArray, $tok);
-        $tok = strtok(" .,!?[]()<>:;-\n'\r\"/*|");
+    $tokensArray   = [];
+    $token         = strtok($text, " .,!?[]()<>:;-\n'\r\"/*|");
+
+    while ($token !== false) {
+        array_push($tokensArray, $token);
+        $token = strtok(" .,!?[]()<>:;-\n'\r\"/*|");
     }
 
     foreach ($tokensArray as &$eachToken) {
         $eachToken = mb_strtolower($eachToken);
     }
     unset($eachToken);
-//    echo "tokensArray to lower case:\n";
-//    var_dump($tokensArray);
-
-//    $stopWords = explode("\n", file_get_contents('/code/docs/stopwords.txt'));
-//
-//    foreach ($stopWords as &$eachWord) {
-//        $eachWord = trim($eachWord);
-//    }
-//    unset($eachWord);
-//    echo "stopWords without spaces:\n";
-//    var_dump($stopWords);
 
     $stopWords = process_file('/code/docs/stopwords.txt');
-//    echo "stopWords without spaces:\n";
-//    var_dump($stopWords);
 
     $tokensArray = array_diff($tokensArray, $stopWords);
-//    echo "После удаления стоп слов:\n";
-//    var_dump($tokensArray);
 
     $tokensArray = preg_grep('/\d+/', $tokensArray, PREG_GREP_INVERT);
-//    echo "Минус слова из чисел:\n";
-//    var_dump($tokensArray);
 
     sort($tokensArray);
-    echo "Отсортированный массив:\n";
-//    print_r($tokensArray);
 
     return $tokensArray;
 }
 
-/**
- * Проверка на наличие слов из запрещенного списка
- * @param array $checkArray Массив для проверки
- */
-function block_list($checkArray)
-{
-    $blockWords = process_file('/code/docs/blocklist.txt');
-//    print_r($blockWords);
-    $blockFound = (bool) count(array_intersect($blockWords, $checkArray));
-//    print_r($blockFound);
-    if ($blockFound) {
-//        return "Block word is found";
-        return [
-            'status'          => 'ok',
-            'spam'            => 'true',
-            'reason'          => 'block_list',
-            'normalized_text' => "placeholder for array",
-        ];
-    }
+function handle_email($email, $string) {
+    $textWithoutEmail = str_replace($email, '', $string);
+    $workArray        = normalize($textWithoutEmail);//Нормализованный массив без почты
+    array_push($workArray, $email);
+    sort($workArray);//Нормализованный массив с почтой
+
+    return $workArray;
 }
 
-if (!empty($_POST)) {
-    $normalizedArray = normalize($_POST);
-    $isSpam          = block_list($normalizedArray);
-    echo json_encode($isSpam);
-} else {
-    echo json_encode(['status' => 'error', 'message' => 'no text']);
+/**
+ * Проверка на наличие слов из запрещенного списка
+ * @param string $checkText Текст для проверки
+ * @param mixed  $checkRate
+ */
+function spam_check($checkText, $checkRate)
+{
+    try {
+        $redis = new Predis\Client([
+            "scheme" => "tcp",
+            "host"   => "redis",
+            "port"   => 6379, ]);
+    }
+    catch (Exception $e) {
+        echo "Couldn't connected to Redis";
+        echo $e->getMessage();
+    }
+
+    //email check
+    if (preg_match('/\b[^\s]+@[^\s]+/', $checkText, $match)) {
+        $email = filter_var($match[0], FILTER_VALIDATE_EMAIL);
+        if ($email) {
+            $normalizedEmailArray = handle_email($email, $checkText);
+
+            return ['status' => 'ok', 'spam' => true, 'reason' => 'block_list', 'normalized_text' => implode(" ", $normalizedEmailArray)];
+        }
+    }
+
+    $normalizedArray = normalize($checkText);
+
+    //blockwords check
+    $blockWords = process_file('/code/docs/blocklist.txt');
+
+    $blockFound = (bool) count(array_intersect($blockWords, $normalizedArray));
+
+    if ($blockFound) {
+        return [
+            'status'          => 'ok',
+            'spam'            => true,
+            'reason'          => 'block_list',
+            'normalized_text' => implode(" ", $normalizedArray),
+        ];
+    }
+    //mixed words check
+    foreach($normalizedArray as $word) {
+        if (preg_match('/[\p{Cyrillic}]/u', $word) && preg_match('/[\p{Latin}]/u', $word)) {
+            return ['status' => 'ok', 'spam' => true, 'reason' => 'mixed_words', 'normalized_text' => implode(" ", $normalizedArray)];
+        }
+    }
+
+    if (count($normalizedArray) >= 3) {
+        if ($redis->exists('lastRequest')){
+            //normalized array of prev request
+            $prevText = json_decode($redis->get('lastRequest'));
+            $prevSize = count($prevText);
+            $redis->set('lastRequest', json_encode($normalizedArray));
+            $count = 0;
+            foreach($normalizedArray as $token) {
+                $found = array_search($token, $prevText);
+                if ($found !== false) {
+                    $count = $count + 1;
+                }
+            }
+            $ratio = $count / $prevSize;
+            if ($ratio >= 0.6) {
+                return ['status' => 'ok', 'spam' => true, 'reason' => 'duplicate'];
+            }
+        } else {
+            $redis->set('lastRequest', json_encode($normalizedArray));
+        }
+    }
+
+    if ($checkRate) {
+        $rateLimiter = new PredisRateLimiter($redis);
+
+        $apiKey = 'request';
+
+        try {
+            $rateLimiter->limit($apiKey, Rate::custom(1, 2));
+            //лимит не превышен
+        } catch (LimitExceeded $exception) {
+            //лимит превышен
+            return ['status' => 'ok', 'spam' => true, 'reason' => 'check_rate'];
+        }
+    }
+
+    return ['status' => 'ok', 'spam' => false, 'reason' => '', 'normalized_text' => implode(" ", $normalizedArray)];
+}
+
+switch($_SERVER['REQUEST_METHOD']) {
+    case 'GET':
+        echo json_encode(['status' => 'ok', 'message' => 'Kolesa Academy!']);
+        break;
+    case 'POST':
+        if(!empty($_POST)) {
+            $txt       = $_POST["text"];
+            $checkRate = $_POST["check_rate"];
+            $isSpam    = spam_check($txt, $checkRate);
+
+            echo json_encode($isSpam);
+        } else {
+            header($_SERVER["SERVER_PROTOCOL"] . " 400 OK");
+            echo json_encode(['status' => 'error', 'message' => 'field text required']);
+        }
+        break;
 }

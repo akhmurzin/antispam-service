@@ -1,0 +1,17 @@
+{
+  "name": "vendor_name/kolesa-academy-antispam",
+  "description": "description",
+  "minimum-stability": "stable",
+  "license": "proprietary",
+  "authors": [
+    {
+      "name": "User",
+      "email": "email@example.com"
+    }
+  ],
+  "require": {
+    "monolog/monolog": "1.0.*",
+    "predis/predis": "1.1.*",
+    "nikolaposa/rate-limit": "^2.1"
+  }
+}
