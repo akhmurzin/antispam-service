@@ -9,7 +9,7 @@ header('Content-type: application/json; charset=utf-8', false);
 /**
  * Функция преобразующая данные файла в массив
  *
- * @param string $path Путь до файла
+ * @param string $path
  */
 function process_file($path)
 {
@@ -26,7 +26,7 @@ function process_file($path)
 /**
  * Преорбразуем входящее сообщение в массив нормализовнных токенов
  *
- * @param string $text Сообщение в параметре 'text'
+ * @param string $text
  */
 function normalize($text)
 {
@@ -73,7 +73,7 @@ function handle_email($email, $string)
 /**
  * Проверка на наличие слов из запрещенного списка
  *
- * @param string $checkText Текст для проверки
+ * @param string $checkText
  * @param mixed  $checkRate
  */
 function spam_check($checkText, $checkRate)
