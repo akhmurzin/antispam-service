@@ -24,7 +24,7 @@ function process_file($path)
 }
 
 /**
- * Преорбразуем входящее сообщение в массив нормализовнных токенов
+ * Преорбразуем входящее сообщение в массив нормализованных токенов
  *
  * @param string $text
  */
@@ -71,7 +71,7 @@ function handle_email($email, $string)
 }
 
 /**
- * Проверка на наличие слов из запрещенного списка
+ * Функция для проверки на спам
  *
  * @param string $checkText
  * @param mixed  $checkRate
@@ -80,12 +80,12 @@ function spam_check($checkText, $checkRate)
 {
     try {
         $redis = new Predis\Client([
-            "scheme" => "tcp",
-            "host"   => "redis",
-            "port"   => 6379,
+            'scheme' => 'tcp',
+            'host'   => 'redis',
+            'port'   => 6379,
         ]);
     } catch (Exception $e) {
-        echo "Couldn't connected to Redis";
+        echo 'Could not connect to Redis';
         echo $e->getMessage();
     }
 
@@ -100,7 +100,7 @@ function spam_check($checkText, $checkRate)
                 'status'          => 'ok',
                 'spam'            => true,
                 'reason'          => 'block_list',
-                'normalized_text' => implode(" ", $normalizedEmailArray),
+                'normalized_text' => implode(' ', $normalizedEmailArray),
             ];
         }
     }
@@ -117,7 +117,7 @@ function spam_check($checkText, $checkRate)
             'status'          => 'ok',
             'spam'            => true,
             'reason'          => 'block_list',
-            'normalized_text' => implode(" ", $normalizedArray),
+            'normalized_text' => implode(' ', $normalizedArray),
         ];
     }
 
@@ -128,7 +128,7 @@ function spam_check($checkText, $checkRate)
                 'status'          => 'ok',
                 'spam'            => true,
                 'reason'          => 'mixed_words',
-                'normalized_text' => implode(" ", $normalizedArray),
+                'normalized_text' => implode(' ', $normalizedArray),
             ];
         }
     }
@@ -173,7 +173,7 @@ function spam_check($checkText, $checkRate)
         }
     }
 
-    return ['status' => 'ok', 'spam' => false, 'reason' => '', 'normalized_text' => implode(" ", $normalizedArray)];
+    return ['status' => 'ok', 'spam' => false, 'reason' => '', 'normalized_text' => implode(' ', $normalizedArray)];
 }
 
 switch ($_SERVER['REQUEST_METHOD']) {
@@ -182,13 +182,13 @@ switch ($_SERVER['REQUEST_METHOD']) {
         break;
     case 'POST':
         if (!empty($_POST)) {
-            $txt       = $_POST["text"];
-            $checkRate = $_POST["check_rate"];
+            $txt       = $_POST['text'];
+            $checkRate = $_POST['check_rate'];
             $isSpam    = spam_check($txt, $checkRate);
 
             echo json_encode($isSpam);
         } else {
-            header($_SERVER["SERVER_PROTOCOL"] . " 400 OK");
+            header($_SERVER['SERVER_PROTOCOL'] . ' 400 OK');
             echo json_encode(['status' => 'error', 'message' => 'field text required']);
         }
 
