@@ -97,8 +97,11 @@ function spam_check($checkText, $checkRate)
             $normalizedEmailArray = handle_email($email, $checkText);
 
             return [
-                'status'          => 'ok', 'spam' => true, 'reason' => 'block_list',
-                'normalized_text' => implode(" ", $normalizedEmailArray), ];
+                'status'          => 'ok',
+                'spam' => true,
+                'reason' => 'block_list',
+                'normalized_text' => implode(" ", $normalizedEmailArray),
+            ];
         }
     }
 
@@ -119,11 +122,14 @@ function spam_check($checkText, $checkRate)
     }
 
     //mixed words check
-    foreach($normalizedArray as $word) {
+    foreach ($normalizedArray as $word) {
         if (preg_match('/[\p{Cyrillic}]/u', $word) && preg_match('/[\p{Latin}]/u', $word)) {
             return [
-                'status'          => 'ok', 'spam' => true, 'reason' => 'mixed_words',
-                'normalized_text' => implode(" ", $normalizedArray), ];
+                'status'          => 'ok',
+                'spam' => true,
+                'reason' => 'mixed_words',
+                'normalized_text' => implode(" ", $normalizedArray),
+            ];
         }
     }
 
