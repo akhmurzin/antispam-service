@@ -82,7 +82,8 @@ function spam_check($checkText, $checkRate)
         $redis = new Predis\Client([
             "scheme" => "tcp",
             "host"   => "redis",
-            "port"   => 6379, ]);
+            "port"   => 6379,
+            ]);
     }
     catch (Exception $e) {
         echo "Couldn't connected to Redis";
