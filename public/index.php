@@ -83,9 +83,8 @@ function spam_check($checkText, $checkRate)
             "scheme" => "tcp",
             "host"   => "redis",
             "port"   => 6379,
-            ]);
-    }
-    catch (Exception $e) {
+        ]);
+    } catch (Exception $e) {
         echo "Couldn't connected to Redis";
         echo $e->getMessage();
     }
@@ -97,7 +96,8 @@ function spam_check($checkText, $checkRate)
         if ($email) {
             $normalizedEmailArray = handle_email($email, $checkText);
 
-            return ['status' => 'ok', 'spam' => true, 'reason' => 'block_list', 'normalized_text' => implode(" ", $normalizedEmailArray)];
+            return ['status'      => 'ok', 'spam' => true, 'reason' => 'block_list',
+                'normalized_text' => implode(" ", $normalizedEmailArray), ];
         }
     }
 
