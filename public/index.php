@@ -45,7 +45,7 @@ function normalize($text)
 
     unset($eachToken);
 
-    $stopWords = process_file('/code/docs/stopwords.txt');
+    $stopWords   = process_file('/code/docs/stopwords.txt');
     $tokensArray = array_diff($tokensArray, $stopWords);
     $tokensArray = preg_grep('/\d+/', $tokensArray, PREG_GREP_INVERT);
     sort($tokensArray);
@@ -72,9 +72,8 @@ function handle_email($email, $string)
 /**
  * Функция для проверки на спам
  *
- * @param string $checkText
- * @param boolean $checkRate
- * @return array
+ * @param  string $checkText
+ * @param  bool   $checkRate
  */
 function spam_check(string $checkText, bool $checkRate)
 {
@@ -165,7 +164,7 @@ function spam_check(string $checkText, bool $checkRate)
 
     if ($checkRate) {
         $rateLimiter = new PredisRateLimiter($redis);
-        $apiKey = 'request';
+        $apiKey      = 'request';
 
         try {
             $rateLimiter->limit($apiKey, Rate::custom(1, 2));
