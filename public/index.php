@@ -72,8 +72,8 @@ function handle_email($email, $string)
 /**
  * Функция для проверки на спам
  *
- * @param  string $checkText
- * @param  bool   $checkRate
+ * @param string $checkText
+ * @param bool   $checkRate
  */
 function spam_check(string $checkText, bool $checkRate)
 {
