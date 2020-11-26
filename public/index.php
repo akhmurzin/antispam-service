@@ -18,6 +18,7 @@ function process_file($path)
     foreach ($words as &$word) {
         $word = trim($word);
     }
+
     unset($word);
 
     return $words;
@@ -41,6 +42,7 @@ function normalize($text)
     foreach ($tokensArray as &$eachToken) {
         $eachToken = mb_strtolower($eachToken);
     }
+
     unset($eachToken);
 
     $stopWords = process_file('/code/docs/stopwords.txt');
